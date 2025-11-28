@@ -1,10 +1,22 @@
-# Tour Expense (Flask + SQLite)
+# Tour Expense — Fullstack (Flask + SQLite / Next.js)
 
-Simple REST API for tracking tours and expenses using Flask and SQLite.
+This repository contains a small tour expense tracker with:
+- Backend: Flask + SQLite REST API
+- Frontend: Next.js app (shadcn-style UI) that consumes the API
 
-Quickstart
+This README explains how to set up and run both parts locally for development.
 
-1. Create a virtual environment and install dependencies:
+Prerequisites
+- Python 3.8+ and `pip`
+- Node.js 16+ and `npm` (or Yarn / pnpm)
+
+Repository layout
+- `/app.py`, `/models.py`, `/requirements.txt` — Flask backend (root)
+- `/frontend` — Next.js frontend
+
+Backend — Quickstart
+
+1. Create and activate a virtual environment and install Python deps:
 
 ```bash
 python3 -m venv .venv
@@ -12,46 +24,71 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Initialize the database:
+2. Initialize the database (creates `tour_expense.db` by default):
 
 ```bash
 export FLASK_APP="app:create_app"
 flask --app app:create_app init-db
 ```
 
-3. Run the server:
+3. Run the backend server (development):
 
 ```bash
-flask --app app:create_app run
+flask --app app:create_app run --host 127.0.0.1 --port 5000
 ```
 
-API examples
+Notes:
+- Default DB: `sqlite:///tour_expense.db`. To change, set `DATABASE_URL` env var.
+- CORS is enabled for development. See `app.py` for details.
 
-- Create a tour
+Backend API (selected endpoints)
+- `POST /api/tours` — Create a tour. JSON: `{ "name": "Trip", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD" }`
+- `GET /api/tours` — List tours
+- `GET /api/tours/<id>` — Get tour with expenses
+- `POST /api/tours/<id>/expenses` — Add expense. JSON: `{ "amount": 12.34, "currency": "USD", "category": "food", "note": "lunch" }`
+- `GET /api/tours/<id>/expenses` — List expenses for a tour
+- `GET /api/summary/tour/<id>` — Totals grouped by currency
+
+Frontend — Quickstart
+
+1. Change into the `frontend` folder and install Node deps:
 
 ```bash
-curl -X POST localhost:5000/api/tours -H 'Content-Type: application/json' -d '{"name": "Spain Trip", "start_date": "2025-05-01", "end_date": "2025-05-14"}'
+cd frontend
+npm install
 ```
 
-- Add an expense to a tour (replace 1 with the tour id)
+2. (Optional) Set frontend API base if backend runs on a non-default host/port:
 
 ```bash
-curl -X POST localhost:5000/api/tours/1/expenses -H 'Content-Type: application/json' -d '{"amount": 123.45, "currency": "EUR", "category": "food", "note": "dinner", "incurred_at": "2025-05-02T19:30:00"}'
+export NEXT_PUBLIC_API_BASE="http://127.0.0.1:5000/api"
 ```
 
-- Get tour with expenses
+3. Start the dev server:
 
 ```bash
-curl localhost:5000/api/tours/1
+npm run dev
 ```
 
-- Get summary totals for a tour
+The app is served at `http://localhost:3000` by default.
+
+Troubleshooting
+- 403 responses when calling `http://localhost:5000` from the browser can happen if another system service is bound to IPv6 `::1` (macOS AirPlay) and the request resolves to IPv6. Use `127.0.0.1` or bind Flask to `0.0.0.0`/`::` or a different port. Example test using IPv4:
 
 ```bash
-curl localhost:5000/api/summary/tour/1
+curl -v http://127.0.0.1:5000/api/tours -H 'Content-Type: application/json' -d '{"name":"Test"}'
 ```
 
-Notes
+- If you see CORS errors in the browser, ensure the backend is running and that `NEXT_PUBLIC_API_BASE` points to the correct origin. CORS is enabled in development in `app.py` but browser preflight will fail if backend is unreachable.
 
-- The app uses `sqlite:///tour_expense.db` by default. Set `DATABASE_URL` environment variable to change.
-- Dates should use ISO formats: `YYYY-MM-DD` for dates, `YYYY-MM-DDTHH:MM:SS` for datetimes.
+Development tips
+- Keep backend running on `127.0.0.1:5000` and frontend on `localhost:3000` for a standard setup.
+- Use the `frontend/lib/api.ts` helpers to call the backend from React components.
+
+Next steps
+- Add authentication, editing/deleting items, or a production-ready config (use a proper DB and stricter CORS/origins).
+
+If you'd like, I can:
+- Recreate the repo from scratch (backup + scaffolding),
+- Add tests for the API, or
+- Improve the UI/UX of the Next frontend.
