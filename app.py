@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
+import logging
 
 from models import db, Tour, Expense
 
@@ -10,6 +12,28 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tour_expense.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    # Enable CORS for all origins (development). Allows frontend at other origins to call API.
+    CORS(app)
+    # Enable detailed request/response logging for debugging 403 issues
+    logging.basicConfig(level=logging.DEBUG)
+    app.logger.setLevel(logging.DEBUG)
+
+    @app.before_request
+    def _log_request():
+        try:
+            body = request.get_data(as_text=True)
+        except Exception:
+            body = '<unavailable>'
+        app.logger.debug(f"Request -> {request.method} {request.path} headers={dict(request.headers)} body={body}")
+
+    @app.after_request
+    def _log_response(response):
+        try:
+            headers = dict(response.headers)
+        except Exception:
+            headers = {}
+        app.logger.debug(f"Response <- {request.method} {request.path} status={response.status} headers={headers}")
+        return response
 
     @app.cli.command('init-db')
     def init_db():
