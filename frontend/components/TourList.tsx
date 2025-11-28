@@ -1,6 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { fetchTours } from "../lib/api";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import Button from "./ui/Button";
+import { RefreshCcw } from "lucide-react";
 
 export default function TourList({
   onSelect,
@@ -29,30 +38,34 @@ export default function TourList({
   }, []);
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Tours</h3>
-        <button className="text-sm text-muted" onClick={load}>
-          Refresh
-        </button>
-      </div>
-      {loading && <div>Loading...</div>}
-      {error && <div className="text-destructive">{error}</div>}
-      <ul className="space-y-1">
-        {tours.map((t) => (
-          <li key={t.id}>
-            <button
-              className="w-full text-left p-2 rounded hover:bg-muted"
-              onClick={() => onSelect?.(t)}
-            >
-              <div className="font-medium">{t.name}</div>
-              <div className="text-sm text-muted-foreground">
-                {t.start_date || "—"} → {t.end_date || "—"}
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Tours</CardTitle>
+        <CardAction>
+          <Button onClick={load}>
+            <RefreshCcw size={15} />
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        {loading && <div>Loading...</div>}
+        {error && <div className="text-destructive">{error}</div>}
+        <ul className="space-y-1">
+          {tours.map((t) => (
+            <li key={t.id}>
+              <button
+                className="w-full text-left p-2 rounded hover:bg-muted"
+                onClick={() => onSelect?.(t)}
+              >
+                <div className="font-medium">{t.name}</div>
+                <div className="text-sm text-muted-foreground">
+                  {t.start_date || "—"} → {t.end_date || "—"}
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 }

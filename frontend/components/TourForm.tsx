@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { createTour } from "../lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export default function TourForm({
   onCreated,
@@ -37,37 +38,44 @@ export default function TourForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-2">
-      <div>
-        <label className="block text-sm">Name</label>
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Trip to Spain"
-        />
-      </div>
-      <div>
-        <label className="block text-sm">Start date</label>
-        <Input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="block text-sm">End date</label>
-        <Input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-      </div>
-      {error && <div className="text-destructive text-sm">{error}</div>}
-      <div>
-        <Button type="submit" disabled={loading || !name}>
-          {loading ? "Creating..." : "Create Tour"}
-        </Button>
-      </div>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Create Tour</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={submit} className="space-y-2">
+          <div>
+            <label className="block text-sm">Name</label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Trip to Spain"
+            />
+          </div>
+          <div>
+            <label className="block text-sm">Start date</label>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm">End date</label>
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+          {error && <div className="text-destructive text-sm">{error}</div>}
+          <div>
+            <Button type="submit" disabled={loading || !name}>
+              {loading ? "Creating..." : "Create Tour"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
